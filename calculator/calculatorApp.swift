@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import TipKit
 
 @main
 struct calculatorApp: App {
@@ -26,6 +27,12 @@ struct calculatorApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .task{
+                    try? Tips.configure([
+                        .displayFrequency(.immediate),
+                        .datastoreLocation(.applicationDefault)
+                    ])
+                }
         }
         .modelContainer(sharedModelContainer)
     }

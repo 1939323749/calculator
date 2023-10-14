@@ -7,6 +7,13 @@
 
 import SwiftUI
 import Expression
+import TipKit
+
+struct AddToInputTip:Tip{
+    var title: Text=Text("Add result to input area")
+    var message: Text?=Text("Press result to add to input area.")
+    var image: Image?=Image(systemName: "doc.on.clipboard")
+}
 
 struct CalculatorView: View {
     @Binding var displayText:String
@@ -208,6 +215,7 @@ struct AdvancedMode:View {
                                 isResultPressed = false
                             }
                         }.foregroundColor(Color.blue)
+                        .popoverTip(AddToInputTip())
                 }
             }.padding([.top,.bottom],10)
             if results.count>0 && !isResultPressed{
