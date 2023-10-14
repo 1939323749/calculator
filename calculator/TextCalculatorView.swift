@@ -17,21 +17,30 @@ struct StartLiveActivityTip:Tip{
 
 struct TextCalculatorView: View {
     @Binding var results : [Result]
+    @Binding var activity :Activity<ResultAttributes>?
     
     @State private var displayText=""
     @State private var inputText = ""
-    @State private var activity :Activity<ResultAttributes>?=nil
     @State private var isDynamicIslandActive=false
 
     var body: some View {
         NavigationView{
             VStack{
-                Text(displayText)
+                if !displayText.elementsEqual("42"){
+                    Text(displayText)
+                        .font(.title)
+                }else{
+                    Text("42")
+                        .font(.title)
+                        .bold()
+                        .foregroundStyle(LinearGradient(colors: [.yellow,.purple,.blue], startPoint: .topLeading, endPoint: .bottomTrailing))
+                }
                 TextField("input expression,e.g. 1+1",text: $inputText)
                     .padding([.leading,.trailing],20)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                Button("Calculate",action:calculateText)
-            }.navigationBarItems(trailing:Button(
+                Button("Calculate",action: calculateText)
+                    .buttonStyle(BorderedButtonStyle())
+            }.navigationBarItems(trailing: Button(
                 action:{
                     toggleActivity()
                 }){
@@ -43,7 +52,8 @@ struct TextCalculatorView: View {
                             .popoverTip(StartLiveActivityTip())
                     }
                 }
-            ).navigationTitle("Input")
+            )
+            .navigationBarItems(leading:InputNavigationBarItemView())
         }
     }
     func calculateText()->Void{
@@ -58,6 +68,10 @@ struct TextCalculatorView: View {
             }else{
                 results.append(Result(expression: inputText, result:String(result)))
                 displayText=String(result)
+            }
+            Task{
+                // It's weird that if using `update(using:...)`, xCode warns that this method was deprecated, but is using suggested `update(_:...)`, it's a compile error.
+                await activity?.update(using:ResultAttributes.Result(expression: inputText, result: displayText))
             }
         }catch{
             displayText="Error"
@@ -84,5 +98,15 @@ struct TextCalculatorView: View {
         let state=ResultAttributes.Result(expression: inputText, result: displayText)
         let content=ActivityContent(state: state, staleDate: Calendar.current.date(byAdding: .second, value: 10, to: Date())!)
         activity=try? Activity<ResultAttributes>.request(attributes: attributes, content: content,pushType: nil)
+    }
+}
+
+struct InputNavigationBarItemView:View {
+    var body: some View {
+        Text("Input")
+            .font(.title)
+            .bold()
+            .foregroundStyle(LinearGradient(colors: [Color.red,Color.green], startPoint: .topLeading, endPoint: .bottomTrailing))
+            .padding(.leading)
     }
 }

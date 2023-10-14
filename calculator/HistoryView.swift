@@ -20,33 +20,44 @@ struct HistoryView: View {
     @Binding var displayText:String
     
     var body: some View {
-        VStack{
-            Text("History")
-                .bold()
-                .padding(.top,50)
-                .font(.title)
-                .foregroundStyle(LinearGradient(colors: [Color.green,Color.blue], startPoint: .bottomLeading, endPoint: .topTrailing))
-            Spacer()
-            List(results,id: \.self){result in
-                HStack{
-                    Text(result.expression)
-                        .onTapGesture {
-                            displayText=result.expression
-                    }
-                    Spacer()
-                    Text(result.result).padding(.trailing,20)
-                        .onTapGesture{
-                            UIPasteboard.general.string=result.result
+        NavigationView{
+            VStack{
+                if results.count==0{
+                    Image(systemName: "doc.questionmark")
+                        .imageScale(.large)
+                    Text("History is empty.")
+                        .font(.footnote)
+                }else{
+                    List(results,id: \.self){result in
+                        HStack{
+                            Text(result.expression)
+                                .onTapGesture {
+                                    displayText=result.expression
+                            }
+                            Spacer()
+                            Text(result.result).padding(.trailing,20)
+                                .onTapGesture{
+                                    UIPasteboard.general.string=result.result
+                                }
+                                .popoverTip(CopyToPasteboardTip())
                         }
-                        .popoverTip(CopyToPasteboardTip())
-
+                    }.padding([.top,.bottom],10)
+                    Spacer()
+                    Text("Tips: Press expression to calculate, press result to copy to pasteboard.")
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(Color.gray)
+                        .font(.footnote)
                 }
-            }.padding([.top,.bottom],10)
-            Spacer()
-            Text("Tips: Press expression to calculate, press result to copy to pasteboard.")
-                .multilineTextAlignment(.center)
-                .foregroundColor(Color.gray)
-                .font(.footnote)
+            }.navigationBarItems(leading:  HistoryNavigationBarItemView())
         }
+    }
+}
+
+struct HistoryNavigationBarItemView:View {
+    var body: some View {
+        Text("History")
+            .bold()
+            .font(.title)
+            .foregroundStyle(LinearGradient(colors: [Color.green,Color.blue], startPoint: .bottomLeading, endPoint: .topTrailing))
     }
 }

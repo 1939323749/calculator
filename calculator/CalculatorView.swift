@@ -5,6 +5,7 @@
 //  Created by mba on 2023/10/10.
 //
 
+import ActivityKit
 import SwiftUI
 import Expression
 import TipKit
@@ -17,6 +18,7 @@ struct AddToInputTip:Tip{
 
 struct CalculatorView: View {
     @Binding var displayText:String
+    @Binding var activity:Activity<ResultAttributes>?
     
     @State private var memText = ["0"]
     @State private var lastExp = "0"
@@ -31,7 +33,16 @@ struct CalculatorView: View {
             Spacer()
             HStack{
                 Spacer()
-                Text(displayText).font(.largeTitle).padding(.trailing)
+                if !displayText.elementsEqual("42"){
+                    Text(displayText)
+                        .font(.largeTitle)
+                        .padding(.trailing)
+                }else{
+                    Text(displayText)
+                        .font(.largeTitle)
+                        .padding(.trailing)
+                        .foregroundStyle(LinearGradient(colors: [.yellow,.purple,.blue], startPoint: .topLeading, endPoint: .bottomTrailing))
+                }
             }.padding()
             Spacer()
             HStack(spacing:16){
@@ -120,6 +131,9 @@ struct CalculatorView: View {
                 displayText=String(result)
             }
             lastExp=displayText
+            Task{
+                await activity?.update(using:ResultAttributes.Result(expression: memText.last!, result: displayText))
+            }
         }catch{
             let alert = UIAlertController(title: "Error", message: "Press redo to back to your last input", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
