@@ -22,6 +22,7 @@ struct TextCalculatorView: View {
     @State private var displayText=""
     @State private var inputText = ""
     @State private var isDynamicIslandActive=false
+    @FocusState private var isInputting:Bool
 
     var body: some View {
         NavigationView{
@@ -38,6 +39,7 @@ struct TextCalculatorView: View {
                 TextField("input expression,e.g. 1+1",text: $inputText)
                     .padding([.leading,.trailing],20)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                .focused($isInputting)
                 Button("Calculate",action: calculateText)
                     .buttonStyle(BorderedButtonStyle())
             }.navigationBarItems(trailing: Button(
@@ -57,6 +59,7 @@ struct TextCalculatorView: View {
         }
     }
     func calculateText()->Void{
+        isInputting.toggle()
         inputText=inputText.lowercased()
         let expression=AnyExpression(inputText)
         var result:Double=0
