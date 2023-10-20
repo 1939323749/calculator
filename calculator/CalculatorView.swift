@@ -9,6 +9,7 @@ import ActivityKit
 import SwiftUI
 import Expression
 import TipKit
+import SwiftData
 
 struct AddToInputTip:Tip{
     var title: Text=Text("Add result to input area")
@@ -26,8 +27,8 @@ struct CalculatorView: View {
     @State private var mode = "normal"    
     @State private var isPresented = false
     
-    
-    @Binding var results : [Result]
+    var modelContext:ModelContext
+    @Query var results:[Result]
     var body: some View {
         VStack(spacing:12){
             Spacer()
@@ -59,7 +60,7 @@ struct CalculatorView: View {
                         .foregroundColor(Color.white)
                         .cornerRadius(5)
                 }.sheet(isPresented: $isPresented){
-                    AdvancedMode(displayText: $displayText, memText: $memText, index: $index,results: $results)
+                    AdvancedMode(displayText: $displayText, memText: $memText, index: $index)
                 }
             }
             HStack(spacing:16){
@@ -124,10 +125,12 @@ struct CalculatorView: View {
         do {
             result = try expression.evaluate()
             if String(result).hasSuffix(".0"){
-                results.append(Result(expression: displayText, result: String(result).replacingOccurrences(of: ".0", with: "")))
+                modelContext.insert(Result(expression: displayText, result: String(result).replacingOccurrences(of: ".0", with: "")))
+//                results.append(Result(expression: displayText, result: String(result).replacingOccurrences(of: ".0", with: "")))
                 displayText=String(result).replacingOccurrences(of: ".0", with: "")
             }else{
-                results.append(Result(expression: displayText, result: String(result)))
+                modelContext.insert(Result(expression: displayText, result: String(result)))
+//                results.append(Result(expression: displayText, result: String(result)))
                 displayText=String(result)
             }
             lastExp=displayText
@@ -209,7 +212,7 @@ struct AdvancedMode:View {
     @Binding var displayText:String
     @Binding var memText:[String]
     @Binding var index:Int
-    @Binding var results:[Result]
+    @Query var results:[Result]
     
     @State private var isResultPressed=false
     

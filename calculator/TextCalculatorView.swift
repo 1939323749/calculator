@@ -9,6 +9,7 @@ import SwiftUI
 import Expression
 import ActivityKit
 import TipKit
+import SwiftData
 
 struct StartLiveActivityTip:Tip{
     var title: Text=Text("Try Live Activity")
@@ -16,7 +17,8 @@ struct StartLiveActivityTip:Tip{
 }
 
 struct TextCalculatorView: View {
-    @Binding var results : [Result]
+    var modelContext:ModelContext
+    @Query var results:[Result]
     @Binding var activity :Activity<ResultAttributes>?
     
     @State private var displayText=""
@@ -66,10 +68,12 @@ struct TextCalculatorView: View {
         do{
             result = try expression.evaluate()
             if String(result).hasSuffix(".0"){
-                results.append(Result(expression: inputText, result:String(result).replacingOccurrences(of: ".0", with: "")))
+                modelContext.insert(Result(expression: inputText, result:String(result).replacingOccurrences(of: ".0", with: "")))
+//                results.append(Result(expression: inputText, result:String(result).replacingOccurrences(of: ".0", with: "")))
                 displayText=String(result).replacingOccurrences(of: ".0", with: "")
             }else{
-                results.append(Result(expression: inputText, result:String(result)))
+                modelContext.insert(Result(expression: inputText, result:String(result)))
+//                results.append(Result(expression: inputText, result:String(result)))
                 displayText=String(result)
             }
             Task{

@@ -7,10 +7,12 @@
 
 import ActivityKit
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
     @State private var activity :Activity<ResultAttributes>?=nil
-    @State private var results = [Result]()
+    @Environment(\.modelContext) private var modelContext
+    @Query  var results:[Result]
     @State private var displayText="0"
     
     var body: some View {
@@ -25,15 +27,15 @@ struct ContentView: View {
                 }.frame(height:geometry.size.height*0.1)
                 Spacer()
                 TabView{
-                    CalculatorView(displayText: $displayText,activity: $activity,results: $results).tabItem{
+                    CalculatorView(displayText: $displayText, activity: $activity, modelContext: modelContext).tabItem{
                         Image(systemName: "keyboard")
                         Text("Cal")
                     }
-                    TextCalculatorView(results: $results,activity: $activity).tabItem{
+                    TextCalculatorView(modelContext: modelContext, activity: $activity).tabItem{
                         Image(systemName: "textformat.12")
                         Text("Input")
                     }
-                    HistoryView(results: $results,displayText:$displayText).tabItem{
+                    HistoryView(displayText: $displayText).tabItem{
                         Image(systemName: "pencil.and.ruler")
                         Text("History")
                     }
@@ -43,7 +45,3 @@ struct ContentView: View {
     }
 }
 
-struct Result:Hashable{
-    var expression:String
-    var result:String
-}

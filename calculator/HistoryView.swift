@@ -7,6 +7,7 @@
 
 import SwiftUI
 import TipKit
+import SwiftData
 
 struct CopyToPasteboardTip:Tip{
     var title: Text=Text("Copy to pasteboard")
@@ -16,7 +17,7 @@ struct CopyToPasteboardTip:Tip{
 struct HistoryView: View {
     var count:Int = 0
     
-    @Binding var results : [Result]
+    @Query var results:[Result]
     @Binding var displayText:String
     
     var body: some View {
