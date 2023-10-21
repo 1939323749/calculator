@@ -35,7 +35,7 @@ struct ContentView: View {
                         Image(systemName: "textformat.12")
                         Text("Input")
                     }
-                    HistoryView(displayText: $displayText).tabItem{
+                    HistoryView(modelContext:modelContext,displayText: $displayText).tabItem{
                         Image(systemName: "pencil.and.ruler")
                         Text("History")
                     }

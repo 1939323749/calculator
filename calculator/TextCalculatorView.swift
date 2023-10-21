@@ -27,7 +27,7 @@ struct TextCalculatorView: View {
     @FocusState private var isInputting:Bool
 
     var body: some View {
-        NavigationView{
+        NavigationSplitView{
             VStack{
                 if !displayText.elementsEqual("42"){
                     Text(displayText)
@@ -44,20 +44,28 @@ struct TextCalculatorView: View {
                 .focused($isInputting)
                 Button("Calculate",action: calculateText)
                     .buttonStyle(BorderedButtonStyle())
-            }.navigationBarItems(trailing: Button(
-                action:{
-                    toggleActivity()
-                }){
-                    if !isDynamicIslandActive{
-                        Image(systemName: "wand.and.stars")
-                            .popoverTip(StartLiveActivityTip())
-                    }else{
-                        Image(systemName: "wand.and.stars.inverse")
-                            .popoverTip(StartLiveActivityTip())
-                    }
+            }
+            .toolbar{
+                ToolbarItem(placement:.topBarLeading){
+                    TopbarItemLeading()
                 }
-            )
-            .navigationBarItems(leading:InputNavigationBarItemView())
+                ToolbarItem(placement:.topBarTrailing){
+                    Button(
+                        action:{
+                            toggleActivity()
+                        }){
+                            if !isDynamicIslandActive{
+                                Image(systemName: "wand.and.stars")
+                                    .popoverTip(StartLiveActivityTip())
+                            }else{
+                                Image(systemName: "wand.and.stars.inverse")
+                                    .popoverTip(StartLiveActivityTip())
+                            }
+                        }
+                }
+            }
+        }detail: {
+            Text("Text calculator")
         }
     }
     func calculateText()->Void{
@@ -108,7 +116,7 @@ struct TextCalculatorView: View {
     }
 }
 
-struct InputNavigationBarItemView:View {
+struct TopbarItemLeading:View {
     var body: some View {
         Text("Input")
             .font(.title)
@@ -116,4 +124,10 @@ struct InputNavigationBarItemView:View {
             .foregroundStyle(LinearGradient(colors: [Color.red,Color.green], startPoint: .topLeading, endPoint: .bottomTrailing))
             .padding(.leading)
     }
+}
+
+#Preview{
+    @Environment(\.modelContext) var modelContext
+    @State var activity :Activity<ResultAttributes>?=nil
+    return TextCalculatorView(modelContext: modelContext, activity: $activity)
 }
